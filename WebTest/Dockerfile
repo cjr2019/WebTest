@@ -1,20 +1,12 @@
-FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
+FROM microsoft/dotnet:2.1-aspnetcore-runtime
+MAINTAINER jinrong.chen
+
+LABEL description="microservice"
+LABEL version="1.0"
+
+ARG microport
+
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
-
-FROM microsoft/dotnet:2.1-sdk AS build
-WORKDIR /src
-COPY ["WebTest/WebTest.csproj", "WebTest/"]
-RUN dotnet restore "WebTest/WebTest.csproj"
-COPY . .
-WORKDIR "/src/WebTest"
-RUN dotnet build "WebTest.csproj" -c Release -o /app
-
-FROM build AS publish
-RUN dotnet publish "WebTest.csproj" -c Release -o /app
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app .
+COPY bin/Release/netcoreapp2.1/publish/ .
+EXPOSE $microport
 ENTRYPOINT ["dotnet", "WebTest.dll"]
